@@ -1,0 +1,40 @@
+{
+  "name": "bd-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "clipboardy": "^2.3.0",
+    "cors": "^2.8.5",
+    "docxtemplater": "^3.65.2",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "google-auth-library": "^10.1.0",
+    "googleapis": "^152.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "libreoffice-convert": "^1.7.0",
+    "mongoose": "^8.16.2",
+    "node-fetch": "^2.7.0",
+    "nodemon": "^3.1.10",
+    "open": "^11.0.0",
+    "openai": "^5.8.3",
+    "pizzip": "^3.2.0",
+    "poe-api": "^1.0.6",
+    "puppeteer": "^24.12.1",
+    "puppeteer-core": "^24.12.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@types/clipboardy": "^2.0.4"
+  }
+}
