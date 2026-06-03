@@ -5,6 +5,9 @@ const generateResumeJsonWithDeepSeek = require("../services/generateResumeJsonWi
 const generateResumeDoc = require("../services/generateResumeDoc");
 const { sanitizeString } = require("../utils/utils");
 
+const shouldUploadResumesToDrive =
+  (process.env.UPLOAD_RESUMES_TO_DRIVE || "false").toLowerCase() === "true";
+
 const createPendingApplication = async ({
   jobLink,
   jobTitle,
@@ -308,7 +311,8 @@ const generateResume = async (req, res) => {
       companyName,
       name,
       jobTitle,
-      template
+      template,
+      shouldUploadResumesToDrive
     );
 
     res.status(200).json({

@@ -4,6 +4,9 @@ const generateResumeDoc = require("../services/generateResumeDoc");
 const fs = require("fs");
 const path = require("path");
 
+const shouldUploadResumesToDrive =
+  (process.env.UPLOAD_RESUMES_TO_DRIVE || "false").toLowerCase() === "true";
+
 const ensureResumeGenerated = async (application) => {
   if (
     application.resumeWordPath ||
@@ -31,7 +34,8 @@ const ensureResumeGenerated = async (application) => {
     application.company,
     application.profile.fullName,
     application.job_title,
-    template
+    template,
+    shouldUploadResumesToDrive
   );
 
   application.resumeWordPath = resumeFiles.docxURL;
@@ -114,13 +118,7 @@ const downloadResumeAndCV = async (req, res) => {
     if (application.driveDocxDownloadLink) {
       application.status = "Downloaded";
       await application.save();
-      return res.status(200).json({
-        success: true,
-        message: "Resume download link ready.",
-        data: {
-          downloadUrl: application.driveDocxDownloadLink,
-        },
-      });
+      return res.redirect(application.driveDocxDownloadLink);
     }
 
     // Convert public URL to local file path for direct download response.
