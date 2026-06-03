@@ -1,7 +1,11 @@
 const fs = require('fs');
-const path = require('path');
 const { google } = require('googleapis');
 const dotenv = require('dotenv');
+const {
+    getOAuthCredentials,
+    getOAuthToken,
+    getServiceAccountCredentials,
+} = require('./googleAuthConfig');
 
 dotenv.config();
 
@@ -17,40 +21,13 @@ function getDriveAuthMode() {
     return (process.env.GOOGLE_DRIVE_AUTH_MODE || 'auto').toLowerCase();
 }
 
-function getServiceAccountKeyPath() {
-    return process.env.GOOGLE_DRIVE_KEY_FILE
-        ? path.resolve(process.cwd(), process.env.GOOGLE_DRIVE_KEY_FILE)
-        : path.join(process.cwd(), "key/google-drive.json");
-}
-
-function getOAuthPaths() {
-    return {
-        credentialsPath: path.join(process.cwd(), 'key/credentials.json'),
-        tokenPath: path.join(process.cwd(), 'key/token.json'),
-    };
-}
-
-function parseJsonEnv(envName) {
-    const value = process.env[envName];
-    if (!value) return null;
-
-    try {
-        return JSON.parse(value);
-    } catch (err) {
-        throw new Error(`Invalid JSON in ${envName}: ${err.message}`);
-    }
-}
-
 async function authorizeServiceAccount() {
     if (cachedAuthClients.service_account) return cachedAuthClients.service_account;
 
-    const serviceAccountKeyPath = getServiceAccountKeyPath();
-    if (!fs.existsSync(serviceAccountKeyPath)) {
-        throw new Error(`Service account key file not found: ${serviceAccountKeyPath}`);
-    }
+    const credentials = getServiceAccountCredentials();
 
     const auth = new google.auth.GoogleAuth({
-        keyFile: serviceAccountKeyPath,
+        credentials,
         scopes: SCOPES,
     });
     const authClient = await auth.getClient();
@@ -61,27 +38,8 @@ async function authorizeServiceAccount() {
 async function authorizeOAuth() {
     if (cachedAuthClients.oauth) return cachedAuthClients.oauth;
 
-    const { credentialsPath, tokenPath } = getOAuthPaths();
-    const envCredentials = parseJsonEnv('GOOGLE_DRIVE_CREDENTIALS_JSON');
-    const envToken = parseJsonEnv('GOOGLE_DRIVE_TOKEN_JSON');
-
-    const credentials = envCredentials || (
-        fs.existsSync(credentialsPath)
-            ? JSON.parse(fs.readFileSync(credentialsPath, 'utf8'))
-            : null
-    );
-
-    const token = envToken || (
-        fs.existsSync(tokenPath)
-            ? JSON.parse(fs.readFileSync(tokenPath, 'utf8'))
-            : null
-    );
-
-    if (!credentials || !token) {
-        throw new Error(
-            "OAuth credentials missing. Provide GOOGLE_DRIVE_CREDENTIALS_JSON and GOOGLE_DRIVE_TOKEN_JSON, or key/credentials.json and key/token.json."
-        );
-    }
+    const credentials = getOAuthCredentials();
+    const token = getOAuthToken();
 
     const oauthConfig = credentials.installed || credentials.web;
 

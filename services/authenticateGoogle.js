@@ -1,7 +1,10 @@
 const fs = require('fs');
-const path = require('path');
 const { google } = require('googleapis');
 const readline = require('readline');
+const {
+    getOAuthCredentials,
+    getOAuthPaths,
+} = require('./googleAuthConfig');
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
@@ -11,12 +14,10 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
  */
 async function authenticateGoogle() {
     try {
-        const credentialsPath = path.join(process.cwd(), "key/credentials.json");
-        const tokenPath = path.join(process.cwd(), "key/token.json");
+        const { tokenPath } = getOAuthPaths();
 
         // Load credentials
-        const credentialsContent = fs.readFileSync(credentialsPath, "utf8");
-        const credentials = JSON.parse(credentialsContent);
+        const credentials = getOAuthCredentials();
         const oauthConfig = credentials.installed || credentials.web;
 
         if (!oauthConfig) {
